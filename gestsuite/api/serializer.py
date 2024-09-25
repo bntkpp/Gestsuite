@@ -10,9 +10,9 @@ class UserRegisterSerializer(serializers.ModelSerializer):
     def create(self, clean_data):
         user_obj = UserModel.objects.create_user(
             username=clean_data['username'], 
+            email=clean_data['email'],
             password=clean_data['password']
         )
-        user_obj.email = clean_data['email']
         user_obj.save()
         return user_obj
 

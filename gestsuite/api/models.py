@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from .validations import validate_rut
 
 class AppUserManager(BaseUserManager):
 	def create_user(self, username, email, password=None):
