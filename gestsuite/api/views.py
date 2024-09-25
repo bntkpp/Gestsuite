@@ -1,3 +1,4 @@
+from django.shortcuts import render, redirect
 from django.contrib.auth import get_user_model, login, logout
 from django.core.exceptions import ValidationError
 from rest_framework.authentication import SessionAuthentication
@@ -6,7 +7,10 @@ from rest_framework.response import Response
 from .serializer import UserRegisterSerializer, UserLoginSerializer, UserSerializer
 from rest_framework import permissions, status
 from .validations import custom_validation, validate_username, validate_password
-
+from .models import Receta, Especialidad, Paciente, Doctor, HorarioDisponible, Cita, HistorialPaciente, FichaMedica
+from .forms import RecetaForm, EspecialidadForm, PacienteForm, DoctorForm, HorarioDisponibleForm, CitaForm, HistorialPacienteForm, FichaMedicaForm
+from django.urls import reverse_lazy
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
 
 class UserRegister(APIView):
     permission_classes = (permissions.AllowAny,)

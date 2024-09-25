@@ -36,26 +36,4 @@ def validate_password(data):
         raise ValidationError('una contraseña es necesaria')
     return True
 
-def validate_rut(value):
-    rut = value.upper().replace(".", "").replace("-", "")
 
-    if len(rut) < 9:
-        raise ValidationError('El RUT debe tener al menos 9 caracteres incluyendo el dígito verificador.')
-
-    cuerpo, dv = rut[:-1], rut[-1]
-
-    if not cuerpo.isdigit():
-        raise ValidationError('El RUT debe contener solo números en la parte del cuerpo.')
-
-    reversed_cuerpo = map(int, reversed(cuerpo))
-    factors = [2, 3, 4, 5, 6, 7]
-    s = sum(d * f for d, f in zip(reversed_cuerpo, factors * 100))
-    mod = (-s) % 11
-
-    if mod == 10:
-        calculated_dv = 'K'
-    else:
-        calculated_dv = str(mod)
-
-    if dv != calculated_dv:
-        raise ValidationError(f'El RUT {value} es inválido.')
