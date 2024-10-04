@@ -89,13 +89,13 @@ class PacienteAutocomplete(autocomplete.Select2QuerySetView):
         if not self.request.user.is_authenticated:
             return Paciente.objects.none()
 
-        qs = Paciente.objects.all()
+        datos = Paciente.objects.all()
 
         if self.q:
             # Buscar por RUT
-            qs = qs.filter(rut_paciente__icontains=self.q)
+            datos = datos.filter(rut_paciente__icontains=self.q)
 
-        return qs
+        return datos
 
     def get_result_label(self, result):
         # Mostrar el nombre en el autocompletado, pero buscar por RUT
@@ -135,16 +135,16 @@ class DoctorAutocomplete(autocomplete.Select2QuerySetView):
         if not self.request.user.is_authenticated:
             return Doctor.objects.none()
 
-        qs = Doctor.objects.all()
+        datos = Doctor.objects.all()
 
         if self.q:
-            # Buscar por RUT
-            qs = qs.filter(rut_doctor__icontains=self.q)
+           
+            datos = datos.filter(rut_doctor__icontains=self.q)
 
-        return qs
+        return datos
 
     def get_result_label(self, result):
-        # Mostrar el nombre en el autocompletado, pero buscar por RUT
+
         return f'{result.rut_doctor} - {result.nombre_doctor}'
 
 
@@ -221,13 +221,13 @@ class HistorialPacienteAutocomplete(autocomplete.Select2QuerySetView):
         if not self.request.user.is_authenticated:
             return HistorialPaciente.objects.none()
 
-        qs = HistorialPaciente.objects.all()
+        datos = HistorialPaciente.objects.all()
 
         if self.q:
-            # Buscar por RUT del paciente en el historial
-            qs = qs.filter(paciente__rut_paciente__icontains=self.q)
+            
+            datos = datos.filter(paciente__rut_paciente__icontains=self.q)
 
-        return qs
+        return datos
 
     def get_result_label(self, result):
         # Mostrar el nombre del paciente en el historial
