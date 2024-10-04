@@ -2,8 +2,8 @@ from django.db import models
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.core.exceptions import ValidationError
-from datetime import datetime
 from .validators import validate_rut
+import datetime
 
 
 class AppUserManager(BaseUserManager):
@@ -63,7 +63,7 @@ class Especialidad(models.Model):
 
 # Modelo Paciente
 class Paciente(models.Model):
-    rut_paciente = models.CharField(max_length=12, primary_key=True, validators=[validate_rut])
+    rut_paciente = models.CharField(max_length=12, primary_key=True)
     nombre_paciente = models.CharField(max_length=50)
     direccion_paciente = models.CharField(max_length=50)
     fecha_nacimiento = models.DateField()
@@ -86,7 +86,7 @@ class Paciente(models.Model):
 
 # Modelo Doctor
 class Doctor(models.Model):
-    rut_doctor = models.CharField(max_length=12, primary_key=True, validators=[validate_rut])
+    rut_doctor = models.CharField(max_length=12, primary_key=True)
     nombre_doctor = models.CharField(max_length=50)
     correo_doctor = models.EmailField(unique=True)
     telefono_doctor = models.CharField(max_length=15)  # Aceptamos números con código internacional
@@ -112,7 +112,7 @@ class HorarioDisponible(models.Model):
     def clean(self):
         if self.hora_inicio_dispo >= self.hora_termino_dispo:
             raise ValidationError('La hora de inicio debe ser menor a la hora de término')
-        if self.fecha_disponible < date.today():
+        if self.fecha_disponible < datetime.date.today():
             raise ValidationError('La fecha de disponibilidad no puede ser menor a la fecha actual')
 
     def __str__(self):
