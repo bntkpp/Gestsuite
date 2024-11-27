@@ -8,8 +8,7 @@ class RecetaForm(forms.ModelForm):
             'nombre_medicamento', 
             'frecuencia_medicamento',
             'dosis',
-            'duracion_medicamento',
-            'historial'
+            'duracion_medicamento'
             ]
 
 class EspecialidadForm(forms.ModelForm):
@@ -90,7 +89,6 @@ class FichaMedicaForm(forms.ModelForm):
             'cirugias',
             'vacunas',
             'antecedentes_fam',
-            'consultas_antiguas',
             'paciente',
             'cita'
         ]

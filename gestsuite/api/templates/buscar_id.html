@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscar ID por RUT</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        label {
+            font-weight: bold;
+            color: #555;
+        }
+        input[type="text"] {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px;
+            font-size: 16px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .message {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #d9534f;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Buscar ID por RUT</h1>
+        <form id="buscar-form">
+            <label for="rut">RUT del Paciente:</label>
+            <input type="text" id="rut" name="rut" placeholder="Ingrese el RUT del paciente" required>
+            <button type="button" onclick="buscarId()">Buscar</button>
+        </form>
+        <div id="resultado" class="message"></div>
+    </div>
+    
+    <script>
+        function buscarId() {
+            const rut = document.getElementById("rut").value.trim();
+            const resultado = document.getElementById("resultado");
+
+            if (!rut) {
+                resultado.textContent = "Por favor, ingrese un RUT válido.";
+                return;
+            }
+
+            fetch(`/api/paciente/buscar/${rut}/`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.id) {
+                        resultado.textContent = `ID del Paciente: ${data.id}`;
+                        resultado.style.color = "green";
+                    } else if (data.error) {
+                        resultado.textContent = `Error: ${data.error}`;
+                        resultado.style.color = "red";
+                    } else {
+                        resultado.textContent = "Paciente no encontrado.";
+                        resultado.style.color = "red";
+                    }
+                })
+                .catch(error => {
+                    resultado.textContent = `Error de conexión: ${error.message}`;
+                    resultado.style.color = "red";
+                });
+        }
+    </script>
+</body>
+</html>

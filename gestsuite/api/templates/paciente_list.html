@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Pacientes</title>
+</head>
+<body>
+    <h1>Lista de Pacientes</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>RUT</th>
+                <th>Dirección</th>
+                <th>Fecha de Nacimiento</th>
+                <th>Sexo</th>
+                <th>Correo</th>
+                <th>Teléfono</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for paciente in object_list %}
+            <tr>
+                <td>{{ paciente.nombre }}</td>
+                <td>{{ paciente.rut }}</td>
+                <td>{{ paciente.direccion }}</td>
+                <td>{{ paciente.fecha_nacimiento }}</td>
+                <td>{{ paciente.sexo }}</td>
+                <td>{{ paciente.correo }}</td>
+                <td>{{ paciente.telefono }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="{% url 'paciente_create' %}">Registrar nuevo paciente</a>
+</body>
+</html>

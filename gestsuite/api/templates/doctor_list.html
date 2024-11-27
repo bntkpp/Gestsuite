@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Doctores</title>
+</head>
+<body>
+    <h1>Lista de Doctores</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>RUT</th>
+                <th>Correo</th>
+                <th>Teléfono</th>
+                <th>Sexo</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for doctor in object_list %}
+            <tr>
+                <td>{{ doctor.nombre_doctor }}</td>
+                <td>{{ doctor.rut_doctor }}</td>
+                <td>{{ doctor.correo_doctor }}</td>
+                <td>{{ doctor.telefono_doctor }}</td>
+                <td>{{ doctor.sexo_doctor }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="{% url 'doctor_create' %}">Registrar nuevo doctor</a>
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Horarios Disponibles</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Horarios Disponibles</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Fecha</th>
+                <th>Hora de Inicio</th>
+                <th>Hora de Término</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for horario in horarios %}
+            <tr>
+                <td>{{ horario.id_disponibilidad }}</td>
+                <td>{{ horario.fecha_disponible }}</td>
+                <td>{{ horario.hora_inicio_dispo }}</td>
+                <td>{{ horario.hora_termino_dispo }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

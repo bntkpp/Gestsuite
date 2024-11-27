@@ -63,7 +63,8 @@ class Especialidad(models.Model):
 
 # Modelo Paciente
 class Paciente(models.Model):
-    rut_paciente = models.CharField(max_length=12, primary_key=True)
+    id_paciente = models.AutoField(primary_key=True)
+    rut_paciente = models.CharField(max_length=12)
     nombre_paciente = models.CharField(max_length=50)
     direccion_paciente = models.CharField(max_length=50)
     fecha_nacimiento = models.DateField()
@@ -86,7 +87,8 @@ class Paciente(models.Model):
 
 # Modelo Doctor
 class Doctor(models.Model):
-    rut_doctor = models.CharField(max_length=12, primary_key=True)
+    id_doctor = models.AutoField(primary_key=True)
+    rut_doctor = models.CharField(max_length=12)
     nombre_doctor = models.CharField(max_length=50)
     correo_doctor = models.EmailField(unique=True)
     telefono_doctor = models.CharField(max_length=15)  # Aceptamos números con código internacional
@@ -145,6 +147,21 @@ class Cita(models.Model):
         verbose_name = "Cita"
         verbose_name_plural = "Citas"
 
+class Receta(models.Model):
+    id_receta = models.AutoField(primary_key=True)
+    nombre_medicamento = models.CharField(max_length=50)
+    frecuencia_medicamento = models.CharField(max_length=50)
+    dosis = models.CharField(max_length=50)
+    duracion_medicamento = models.IntegerField(help_text="Duración del tratamiento en días")
+
+    def __str__(self):
+        return f'Receta {self.id_receta} - {self.nombre_medicamento}'
+
+    class Meta:
+        verbose_name = "Receta"
+        verbose_name_plural = "Recetas"
+
+
 # Modelo HistorialPaciente
 class HistorialPaciente(models.Model):
     
@@ -152,6 +169,7 @@ class HistorialPaciente(models.Model):
     fecha_tratamiento = models.DateField()
     diagnostico = models.TextField()
     observaciones_consulta = models.TextField()
+    receta = models.ForeignKey(Receta, on_delete=models.CASCADE)
     paciente = models.ForeignKey(Paciente, on_delete=models.CASCADE)
     doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
 
@@ -162,21 +180,7 @@ class HistorialPaciente(models.Model):
         verbose_name = "Historial del Paciente"
         verbose_name_plural = "Historiales de Pacientes"
 
-# Modelo Receta
-class Receta(models.Model):
-    id_receta = models.AutoField(primary_key=True)
-    nombre_medicamento = models.CharField(max_length=50)
-    frecuencia_medicamento = models.CharField(max_length=50)
-    dosis = models.CharField(max_length=50)
-    duracion_medicamento = models.IntegerField(help_text="Duración del tratamiento en días")
-    historial = models.ForeignKey(HistorialPaciente, on_delete=models.CASCADE)
 
-    def __str__(self):
-        return f'Receta {self.id_receta} - {self.nombre_medicamento}'
-
-    class Meta:
-        verbose_name = "Receta"
-        verbose_name_plural = "Recetas"
 
 # Modelo FichaMedica
 class FichaMedica(models.Model):
@@ -190,7 +194,6 @@ class FichaMedica(models.Model):
     cirugias = models.TextField()
     vacunas = models.TextField()
     antecedentes_fam = models.TextField()
-    consultas_antiguas = models.ForeignKey(HistorialPaciente, on_delete=models.CASCADE)
     paciente = models.ForeignKey(Paciente, on_delete=models.CASCADE)
     cita = models.ForeignKey(Cita, on_delete=models.CASCADE)
 
@@ -200,3 +203,5 @@ class FichaMedica(models.Model):
     class Meta:
         verbose_name = "Ficha Médica"
         verbose_name_plural = "Fichas Médicas"
+
+    

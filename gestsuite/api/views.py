@@ -1,3 +1,4 @@
+import json
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import get_user_model, login, logout
 from django.core.exceptions import ValidationError
@@ -13,6 +14,19 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
 from django.contrib import messages
 from dal import autocomplete
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+from django.middleware.csrf import get_token
+from django.http import JsonResponse
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.http import require_http_methods
+from django.views import View
+
+
+@ensure_csrf_cookie
+def get_csrf(request):
+    return JsonResponse({"message": "Token CSRF obtenido correctamente"})
 
 class UserRegister(APIView):
     permission_classes = (permissions.AllowAny,)
@@ -60,29 +74,74 @@ class UserView(APIView):
 class PacienteListView(ListView):
     model = Paciente
     context_object_name = 'pacientes'
-    template_name = 'paciente/paciente_list.html' #donde se va a mostrar la lista de pacientes
+    template_name = 'paciente_list.html' #donde se va a mostrar la lista de pacientes
+
+def lista_pacientes_api(request):
+    """
+    Endpoint para devolver la lista de pacientes en formato JSON.
+    """
+    pacientes = Paciente.objects.all().values(
+        'id_paciente','rut_paciente', 'nombre_paciente', 'direccion_paciente', 
+        'fecha_nacimiento', 'sexo_paciente', 'correo_paciente', 'telefono_paciente'
+    )
+    return JsonResponse(list(pacientes), safe=False)    
 
 class PacienteDetailView(DetailView):
     model = Paciente
-    context_object_name = 'pacientes'
-    template_name = 'paciente/paciente_detail.html'
+    context_object_name = 'paciente'
+    template_name = 'paciente_detail.html'
 
 class PacienteCreateView(CreateView):
     model = Paciente
     form_class = PacienteForm #formulario que se va a usar 
-    template_name = 'paciente/paciente_form.html' #donde se va a mostrar el formulario
-    success_url = reverse_lazy('paciente_list') #redirige a la lista de pacientes
+    template_name = 'paciente_create.html' #donde se va a mostrar el formulario
+    success_url = reverse_lazy('http://127.0.0.1:8000/api/paciente/') #redirigir a la lista de pacientes
 
-class PacienteUpdateView(UpdateView):
-    model = Paciente
-    form_class = PacienteForm
-    template_name = 'paciente/paciente_form.html'
-    success_url = reverse_lazy('paciente_list') 
 
-class PacienteDeleteView(DeleteView):
-    model = Paciente
-    template_name = 'paciente/paciente_delete.html'
-    success_url = reverse_lazy('paciente_list')
+def paciente_update(request, id):
+    paciente = get_object_or_404(Paciente, id_paciente=id)
+    if request.method == 'PUT':
+        try:
+            data = json.loads(request.body)
+            paciente.rut = data.get('rut_paciente', paciente.rut_paciente)
+            paciente.nombre_paciente = data.get('nombre_paciente', paciente.nombre_paciente)
+            paciente.direccion_paciente = data.get('direccion_paciente', paciente.direccion_paciente)
+            paciente.fecha_nacimiento = data.get('fecha_nacimiento', paciente.fecha_nacimiento)
+            paciente.sexo_paciente = data.get('sexo_paciente', paciente.sexo_paciente)
+            paciente.correo_paciente = data.get('correo_paciente', paciente.correo_paciente)
+            paciente.telefono_paciente = data.get('telefono_paciente', paciente.telefono_paciente)
+            paciente.save()
+            return JsonResponse({'message': 'Paciente actualizado exitosamente.'})
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Error al decodificar JSON.'}, status=400)
+    return JsonResponse({'error': 'Método no permitido.'}, status=405)
+
+def paciente_delete(request, id):
+    if request.method == 'DELETE':
+        try:
+            paciente = get_object_or_404(Paciente, id_paciente=id)
+            paciente.delete()
+            return JsonResponse({"message": "Paciente eliminado exitosamente"}, status=204)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=400)
+    else:
+        return JsonResponse({"error": "Método no permitido"}, status=405)
+
+def buscar_id(request, rut):
+    try:
+        paciente = get_object_or_404(Paciente, rut_paciente=rut)
+        return JsonResponse({"id": paciente.id_paciente}, status=200)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=404)
+
+def delete_paciente(request, rut_paciente):
+    if request.method == 'DELETE':
+        try:
+            paciente = Paciente.objects.get(rut_paciente=rut_paciente)
+            paciente.delete()
+            return JsonResponse({"message": "Paciente eliminado exitosamente."}, status=204)
+        except Paciente.DoesNotExist:
+            return JsonResponse({"error": "Paciente no encontrado."}, status=404)
 
 class PacienteAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
@@ -107,6 +166,16 @@ class DoctorListView(ListView):
     model = Doctor
     context_object_name = 'doctores'
     template_name = 'doctor/doctor_list.html'
+
+def lista_doctores_api(request):
+    """
+    Endpoint para devolver la lista de pacientes en formato JSON.
+    """
+    doctores = Doctor.objects.all().values(
+        'id_doctor','rut_doctor', 'nombre_doctor', 'correo_doctor', 'telefono_doctor',
+        'sexo_doctor'
+    )
+    return JsonResponse(list(doctores), safe=False)    
 
 class DoctorDetailView(DetailView):
     model = Doctor
@@ -287,6 +356,33 @@ class HorarioDisponibleListView(ListView):
     model = HorarioDisponible
     context_object_name = 'horarios'
     template_name = 'horario_disponible/horario_disponible_list.html'
+
+def lista_horariodisponible_api(request):
+    """
+    Endpoint para devolver la lista de pacientes en formato JSON.
+    """
+    horarios = HorarioDisponible.objects.all().values(
+        'id_disponibilidad','fecha_disponible', 'hora_inicio_dispo', 
+        'hora_termino_dispo', 'doctor'
+    )
+    return JsonResponse(list(horarios), safe=False)    
+
+def filtrar_horarios(request):
+    doctor_id = request.GET.get('doctor_id')  # Obtener el parámetro de la URL
+    if not doctor_id:
+        return JsonResponse({"error": "Se debe proporcionar doctor_id"}, status=400)
+    
+    horarios = HorarioDisponible.objects.filter(doctor_id=doctor_id)
+    resultados = [
+        {
+            "id_disponibilidad": horario.id_disponibilidad,
+            "fecha_disponible": horario.fecha_disponible.strftime("%Y-%m-%d"),
+            "hora_inicio_dispo": horario.hora_inicio_dispo.strftime("%H:%M"),
+            "hora_termino_dispo": horario.hora_termino_dispo.strftime("%H:%M"),
+        }
+        for horario in horarios
+    ]
+    return JsonResponse(resultados, safe=False)
 
 class HorarioDisponibleCreateView(CreateView):
     model = HorarioDisponible

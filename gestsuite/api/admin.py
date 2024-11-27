@@ -30,10 +30,7 @@ class HistorialPacienteAdmin(admin.ModelAdmin):
 class RecetaForm(forms.ModelForm):
     class Meta:
         model = Receta
-        fields = ['nombre_medicamento', 'frecuencia_medicamento', 'dosis', 'duracion_medicamento', 'historial']
-        widgets = {
-            'historial': autocomplete.ModelSelect2(url='historialpaciente-autocomplete'),
-        }
+        fields = ['nombre_medicamento', 'frecuencia_medicamento', 'dosis', 'duracion_medicamento']
 
 class RecetaAdmin(admin.ModelAdmin):
     form = RecetaForm
